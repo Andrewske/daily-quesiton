@@ -60,6 +60,7 @@ model User {
     isAdmin       Boolean?  @default(false)
     accounts      Account[]
     sessions      Session[]
+    userAnswers   UserAnswer[]
 }
 
 model VerificationToken {
@@ -68,4 +69,25 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+model Question {
+    id           Int    @id @default(autoincrement())
+    text         String    @unique
+    userAnswers  UserAnswer[]
+
+}
+
+model UserAnswer {
+    id           String    @id @default(cuid())
+    userId       String
+    questionId   Int
+    rating       Decimal?
+    createdAt    DateTime  @default(now())
+
+    user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    question     Question  @relation(fields: [questionId], references: [id], onDelete: NoAction)
+
+    @@index([questionId])
+    @@index([userId])
 }
